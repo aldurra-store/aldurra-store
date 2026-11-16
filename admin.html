@@ -59,13 +59,15 @@ const reqs=await api("product_requests?select=*&order=created_at.desc");$("reque
 function renderProducts(){const q=($("search").value||"").toLowerCase();$("products").innerHTML=products.filter(p=>p.name.toLowerCase().includes(q)).map(p=>`<tr><td>${p.id}</td><td><input id="n${p.id}" value="${esc(p.name)}"></td><td><input id="p${p.id}" type="number" min="0" value="${p.price_sdg}"></td><td><input id="s${p.id}" type="number" min="0" value="${p.stock_quantity??0}"></td><td><input id="a${p.id}" type="checkbox" ${p.is_active?"checked":""}></td><td><label for="img${p.id}" class="gold" style="display:block;text-align:center;padding:10px;border-radius:9px;cursor:pointer;min-width:125px">📷 اختيار صورة</label><input id="img${p.id}" type="file" accept="image/jpeg,image/png,image/webp" style="display:none" onchange="document.getElementById('fileName${p.id}').textContent=this.files[0]?.name||'لم يتم اختيار صورة'"><div id="fileName${p.id}" class="muted" style="margin:6px 0;max-width:150px;overflow-wrap:anywhere">لم يتم اختيار صورة</div><button onclick="uploadProductImage(${p.id})" style="min-width:125px">⬆ رفع الصورة</button><div class="muted">${p.image_url?'توجد صورة حالية':'لا توجد صورة'}</div></td><td><button class="gold" onclick="saveProduct(${p.id})">حفظ البيانات</button></td></tr>`).join("");}
 async function saveProduct(id){try{const p={name:$("n"+id).value.trim(),price_sdg:Number($("p"+id).value),stock_quantity:Number($("s"+id).value),is_active:$("a"+id).checked};if(!p.name||p.price_sdg<0||p.stock_quantity<0)throw new Error("راجع الاسم والسعر والكمية");await api("products?id=eq."+id,{method:"PATCH",headers:{"Prefer":"return=minimal"},body:JSON.stringify(p)});say("تم حفظ المنتج");await loadAll();}catch(e){alert("لم يتم الحفظ: "+e.message);}}
 async function storageUpload(path,file){
- if(!token||!refreshToken)throw new Error("جلسة الإدارة غير صالحة. سجّل الدخول من جديد.");
- await refreshAdminSession();
+ if(!token)throw new Error("جلسة الإدارة غير صالحة. سجّل الدخول من جديد.");
  const url=cfg.url+"/storage/v1/object/aldurra-products/"+path;
  const send=()=>fetch(url,{method:"POST",headers:{apikey:cfg.publishableKey,Authorization:"Bearer "+token,"Content-Type":file.type},body:file});
  let r;
  try{r=await send();}catch(e){throw new Error("تعذر الاتصال بخدمة الصور. جرّب شبكة إنترنت مختلفة أو أوقف VPN إن كان يعمل.");}
- if(r.status===401){await refreshAdminSession();try{r=await send();}catch(e){throw new Error("انقطع الاتصال بخدمة الصور بعد تجديد الدخول.");}}
+ if(r.status===401){
+   await refreshAdminSession();
+   try{r=await send();}catch(e){throw new Error("انقطع الاتصال بخدمة الصور بعد تجديد الدخول.");}
+ }
  if(!r.ok){const msg=await r.text();throw new Error("خدمة الصور ("+r.status+"): "+msg.slice(0,350));}
  return cfg.url+"/storage/v1/object/public/aldurra-products/"+path;
 }
