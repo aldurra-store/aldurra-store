@@ -1,4 +1,4 @@
-const CACHE_NAME = "aldurra-store-v3";
+const CACHE_NAME = "aldurra-store-v4";
 const CORE_FILES = [
   "./", "./index.html", "./admin.html", "./manifest.webmanifest",
   "./logo.jpg"
