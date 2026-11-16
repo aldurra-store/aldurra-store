@@ -102,7 +102,7 @@ async function loadProductsFromDatabase(){
 function renderProducts(){
  document.getElementById("productGrid").innerHTML = products.map((p,i)=>`
  <article class="product">
-  ${p.img ? `<img src="./${p.img}" alt="${p.name}" loading="lazy">` : `<div class="placeholder">صورة المنتج<br>قريباً</div>`}
+  ${p.img ? `<img src="${p.img.startsWith("http")?p.img:"./"+p.img}" alt="${p.name}" loading="lazy">` : `<div class="placeholder">صورة المنتج<br>قريباً</div>`}
   <div class="product-info"><h3>${p.name}</h3><div class="price">${p.price} ج.س</div>
   <button class="goldbtn" onclick="addToCart(${i})">أضف إلى السلة</button></div></article>`).join("");
 }
