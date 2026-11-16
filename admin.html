@@ -6,76 +6,47 @@
 :root{--p:#301039;--g:#CDA64C;--c:#F8F4EE}*{box-sizing:border-box}body{margin:0;background:var(--c);font-family:Tahoma,Arial;color:#281f2b}
 header{background:var(--p);color:#fff;padding:20px 5vw}header h1{margin:0;color:#f0d38d;font-size:24px}header p{margin:5px 0 0;color:#eee}
 main{max-width:1100px;margin:25px auto;padding:0 16px}.notice{background:#fff4d9;border:1px solid #e8ca83;border-radius:12px;padding:12px;margin-bottom:18px;font-size:14px}
-.toolbar{display:flex;gap:10px;flex-wrap:wrap;margin:14px 0}.toolbar input{flex:1;min-width:190px}
-input,button{font:inherit;border-radius:9px;padding:10px;border:1px solid #d7cbd9}button{cursor:pointer;background:var(--p);color:#fff;border:0;font-weight:bold}.gold{background:var(--g);color:#29172e}.danger{background:#8e2632}
+.toolbar,.row{display:flex;gap:10px;flex-wrap:wrap;margin:14px 0}.row>*{flex:1;min-width:145px}
+input,button,select{font:inherit;border-radius:9px;padding:10px;border:1px solid #d7cbd9}button{cursor:pointer;background:var(--p);color:#fff;border:0;font-weight:bold}.gold{background:var(--g);color:#29172e}.danger{background:#8e2632}
 .card{background:white;border-radius:15px;padding:18px;margin:14px 0;box-shadow:0 4px 18px #3010390d}
-table{width:100%;border-collapse:collapse;background:white}th,td{padding:10px;border-bottom:1px solid #eee;text-align:right;font-size:14px}th{background:#f3edf4;color:var(--p)}
-td input{width:100%;min-width:80px}.name{min-width:190px}.price{min-width:90px}.stock{min-width:70px}
-.row{display:flex;gap:10px;flex-wrap:wrap}.row>*{flex:1;min-width:150px}
-#status{font-size:13px;color:#277044;margin-inline-start:8px}
-@media(max-width:650px){.tablewrap{overflow:auto}table{min-width:720px}}
-</style><link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="./logo.jpg"></head>
-<body><header><h1>لوحة إدارة الدُرّة</h1><p>إدارة المنتجات والأسعار والكميات</p></header>
+table{width:100%;border-collapse:collapse;background:white}th,td{padding:10px;border-bottom:1px solid #eee;text-align:right;font-size:14px}th{background:#f3edf4;color:var(--p)}td input{width:100%;min-width:80px}.name{min-width:170px}.price{min-width:95px}
+#status{font-size:13px;color:#277044}.muted{font-size:13px;color:#766d77}.hidden{display:none}.tablewrap{overflow:auto}table{min-width:700px}
+@media(max-width:650px){header h1{font-size:20px}}
+</style></head>
+<body><header><h1>لوحة إدارة الدُرّة</h1><p>إدارة المنتجات والطلبات من أي جهاز</p></header>
 <main>
-<div class="notice"><b>تنبيه مهم:</b> هذه لوحة تجريبية تعمل على نفس المتصفح والجهاز باستخدام التخزين المحلي. ليست لوحة إدارة متصلة بقاعدة بيانات أو محمية بتسجيل دخول؛ لا تستخدمها لإدارة متجر منشور أو بيانات عملاء حقيقية.</div>
-<section class="card"><h2>إضافة منتج جديد</h2>
-<div class="row"><input id="newName" placeholder="اسم المنتج"><input id="newPrice" placeholder="السعر بالجنيه السوداني"><input id="newStock" type="number" min="0" placeholder="الكمية المتوفرة"></div>
-<div class="row" style="margin-top:10px"><input id="newImage" type="file" accept="image/*"><button class="gold" onclick="addProduct()">إضافة المنتج</button><button onclick="exportData()">تنزيل نسخة احتياطية للمنتجات</button><label style="display:flex;align-items:center;gap:6px"><input id="importFile" type="file" accept="application/json" onchange="importData(event)">استيراد نسخة احتياطية</label></div>
-</section>
-<section class="card"><div class="row" style="align-items:center"><h2 style="margin:0">قائمة المنتجات</h2><input id="search" placeholder="ابحث باسم المنتج..." oninput="render()"><span id="status"></span></div>
-<div class="tablewrap"><table><thead><tr><th>#</th><th>المنتج</th><th>السعر (ج.س)</th><th>الكمية</th><th>الصورة</th><th>حفظ / حذف</th></tr></thead><tbody id="rows"></tbody></table></div>
-</section>
-<section class="card"><div class="row" style="align-items:center"><h2 style="margin:0">سجل الطلبات التجريبي</h2><button onclick="renderOrders()">تحديث السجل</button></div>
-<p style="font-size:13px;color:#766d77">يعرض الطلبات التي تم إنشاؤها من واجهة المتجر على نفس المتصفح والجهاز فقط.</p>
-<div class="tablewrap"><table><thead><tr><th>رقم الطلب</th><th>التاريخ</th><th>العميل</th><th>الهاتف</th><th>الإجمالي</th><th>الحالة</th><th>تحديث الحالة</th></tr></thead><tbody id="orders"></tbody></table></div>
-</section>
-<p><a href="index.html">العودة إلى واجهة المتجر</a></p>
-</main>
+<section class="card" id="loginCard"><h2>دخول الإدارة</h2><p>أدخل بريد الإدارة، وسنرسل لك رابط دخول آمن.</p>
+<div class="row"><input id="email" type="email" value="mahmoud676king@gmail.com" placeholder="البريد الإلكتروني"><button onclick="sendLogin()">إرسال رابط الدخول</button></div><p id="loginMsg" class="muted"></p></section>
+<div id="app" class="hidden">
+<div class="notice">أنت مسجل الدخول بحساب الإدارة. التغييرات تحفظ في قاعدة بيانات المتجر.</div>
+<div class="toolbar"><button class="gold" onclick="loadAll()">تحديث البيانات</button><button class="danger" onclick="logout()">تسجيل الخروج</button><span id="status"></span></div>
+<section class="card"><h2>إضافة منتج</h2><div class="row"><input id="newName" placeholder="اسم المنتج"><input id="newPrice" type="number" min="0" placeholder="السعر بالجنيه"><input id="newStock" type="number" min="0" placeholder="الكمية"></div><div class="row"><input id="newImage" type="file" accept="image/jpeg,image/png,image/webp"><button class="gold" onclick="addProduct()">حفظ المنتج</button></div></section>
+<section class="card"><div class="row"><h2>المنتجات</h2><input id="search" placeholder="بحث باسم المنتج" oninput="renderProducts()"></div><div class="tablewrap"><table><thead><tr><th>#</th><th>المنتج</th><th>السعر</th><th>الكمية</th><th>ظاهر للزبائن</th><th>حفظ</th></tr></thead><tbody id="products"></tbody></table></div></section>
+<section class="card"><h2>الطلبات</h2><div class="tablewrap"><table><thead><tr><th>رقم التتبع</th><th>التاريخ</th><th>العميل</th><th>الهاتف</th><th>الإجمالي</th><th>الحالة</th></tr></thead><tbody id="orders"></tbody></table></div></section>
+<section class="card"><h2>الشكاوى والمقترحات</h2><div class="tablewrap"><table><thead><tr><th>الاسم</th><th>الهاتف</th><th>الرسالة</th><th>التاريخ</th></tr></thead><tbody id="messages"></tbody></table></div></section>
+<section class="card"><h2>طلبات المنتجات غير المتوفرة</h2><div class="tablewrap"><table><thead><tr><th>المنتج</th><th>تفاصيل</th><th>الهاتف</th><th>التاريخ</th><th>الحالة</th></tr></thead><tbody id="requests"></tbody></table></div></section>
+</div><p><a href="./index.html">العودة إلى المتجر</a></p></main>
+<script src="./supabase-config.js"></script>
 <script>
-const initial = [{"name": "طقم صواني ملمين تقيل", "price": "65.000", "img": "product-02.jpg"}, {"name": "هيتر لمس أوك سلفر كرست الأصلي", "price": "160.000", "img": "product-03.jpg"}, {"name": "أطقم مباخر", "price": "18.000", "img": "product-01.png"}, {"name": "كبة سلفر كرست 3 لتر", "price": "90.000", "img": "product-04.jpg"}, {"name": "حافظة نص جالون", "price": "45.000", "img": "product-05.jpg"}, {"name": "سخان + سيرمس 2×1", "price": "110.000", "img": "product-06.jpg"}, {"name": "طقم تلاجه 5 قطع", "price": "40.000", "img": "product-07.jpg"}, {"name": "سيرمس قهوة", "price": "25.000", "img": "product-08.jpg"}, {"name": "سحانة 50 جرام", "price": "40.000", "img": "product-09.jpg"}, {"name": "تنكة قهوة", "price": "45.000", "img": "product-10.jpg"}, {"name": "جك أستيل تقيل + 6 كبابي", "price": "75.000", "img": "product-11.jpg"}, {"name": "مفراك كهربائي", "price": "45.000", "img": "product-12.jpg"}, {"name": "طقم براد مدرج", "price": "75.000", "img": "product-13.jpg"}, {"name": "جك شفاف 7 كيلو", "price": "10.000", "img": null}, {"name": "جردل شفاف 5 كيلو", "price": "8.000", "img": null}, {"name": "جردل شفاف 3 كيلو", "price": "6.000", "img": null}, {"name": "جردل ملون 7 كيلو", "price": "14.000", "img": null}, {"name": "جردل ملون 5 كيلو", "price": "12.000", "img": null}, {"name": "جردل ملون 3 كيلو", "price": "8.000", "img": null}, {"name": "طقم فناجيل", "price": "35.000", "img": null}, {"name": "سلات قهوة ( صغيرة )", "price": "3.000", "img": null}, {"name": "كبابي مك كبيرة", "price": "8.000", "img": null}, {"name": "كبابي مك صغيرة", "price": "7.000", "img": null}, {"name": "سكرية مذهبة", "price": "30.000", "img": null}, {"name": "جك كبير", "price": "9.000", "img": null}, {"name": "جك صغير", "price": "6.000", "img": null}, {"name": "كرك", "price": "2.000", "img": null}, {"name": "طقم مصفي حديد", "price": "10.000", "img": null}, {"name": "صينية شاي", "price": "2.000", "img": null}, {"name": "حمالة", "price": "3.000", "img": null}, {"name": "صواني موردة", "price": "5.000", "img": null}, {"name": "صينية شاي", "price": "4.000", "img": null}, {"name": "طش غسيل بلاستيك", "price": "10.000", "img": null}, {"name": "حوض أطفالي", "price": "10.000", "img": null}, {"name": "حوض غسيل متوسط", "price": "8.000", "img": null}, {"name": "حوض صغير", "price": "5.000", "img": null}, {"name": "طقم رمضاني جكين + 4 كبابي", "price": "30.000", "img": null}, {"name": "طقم بهار", "price": "40.000", "img": null}, {"name": "حلة ديزني 6 لتر", "price": "280.000", "img": null}, {"name": "خلاط اوك سلفر كرست", "price": "180.000", "img": null}, {"name": "سخان 2 لتر", "price": "75.000", "img": null}, {"name": "شعالة فحم", "price": "45.000", "img": null}, {"name": "بوتجاز تيفال zh", "price": "200.000", "img": null}, {"name": "مكوة فلبس", "price": "120.000", "img": null}, {"name": "فرن كومتيل", "price": "470.000", "img": null}, {"name": "صاج كسرة", "price": "160.000", "img": null}];
-let items = initial.map(p=>({...p,stock: p.stock ?? 0}));
-try{const saved=localStorage.getItem('aldurra_products');if(saved)items=JSON.parse(saved)}catch(e){}
-const say=t=>document.getElementById('status').textContent=t;
-function persist(){localStorage.setItem('aldurra_products',JSON.stringify(items));say('تم الحفظ على هذا الجهاز');}
-function render(){
- const q=document.getElementById('search').value.trim().toLowerCase();
- document.getElementById('rows').innerHTML=items.map((p,i)=>({p,i})).filter(x=>x.p.name.toLowerCase().includes(q)).map(({p,i})=>`
- <tr><td>${i+1}</td><td><input class="name" id="n${i}" value="${esc(p.name)}"></td>
- <td><input class="price" id="p${i}" value="${esc(p.price)}"></td>
- <td><input class="stock" id="s${i}" type="number" min="0" value="${Number(p.stock)||0}"></td>
- <td>${p.img?'<span>مضافة</span>':'<span>غير مضافة</span>'}</td>
- <td><button class="gold" onclick="save(${i})">حفظ</button> <button class="danger" onclick="del(${i})">حذف</button></td></tr>`).join('');
-}
-function esc(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
-function save(i){
- const name=document.getElementById('n'+i).value.trim(),price=document.getElementById('p'+i).value.trim(),stock=Number(document.getElementById('s'+i).value);
- if(!name||!price||!Number.isFinite(stock)||stock<0){alert('راجع الاسم والسعر والكمية.');return;}
- items[i]={...items[i],name,price,stock};persist();render();
-}
-function del(i){if(confirm('هل تريد حذف هذا المنتج من قائمة هذا الجهاز؟')){items.splice(i,1);persist();render();}}
-function readImage(file){return new Promise((resolve,reject)=>{if(!file)return resolve(null);const r=new FileReader();r.onload=()=>resolve(r.result);r.onerror=reject;r.readAsDataURL(file);});}
-async function addProduct(){
- const name=document.getElementById('newName').value.trim(),price=document.getElementById('newPrice').value.trim(),stock=Number(document.getElementById('newStock').value||0);
- if(!name||!price||stock<0){alert('أدخل اسم المنتج وسعره وتأكد من الكمية.');return;}
- const img=await readImage(document.getElementById('newImage').files[0]);
- items.push({name,price,stock,img});persist();render();
- ['newName','newPrice','newStock','newImage'].forEach(id=>document.getElementById(id).value='');
-}
-function exportData(){const blob=new Blob([JSON.stringify(items,null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='aldurra-products-backup.json';a.click();URL.revokeObjectURL(a.href);}
-function importData(e){const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{try{const data=JSON.parse(r.result);if(!Array.isArray(data)||!data.every(p=>p.name&&p.price))throw 0;items=data;persist();render();}catch(_){alert('ملف النسخة الاحتياطية غير صالح.');}};r.readAsText(f);}
-function renderOrders(){
- let orders=[];try{orders=JSON.parse(localStorage.getItem('aldurra_orders')||'[]')}catch(e){}
- document.getElementById('orders').innerHTML=orders.length?orders.map((o,i)=>`
- <tr><td>${esc(o.id)}</td><td>${esc(o.date)}</td><td>${esc(o.name||'—')}</td><td>${esc(o.phone||'—')}</td>
- <td>${Number(o.total).toLocaleString('en-US')} ج.س</td><td>${esc(o.status||'طلب جديد')}</td>
- <td><select onchange="changeOrderStatus(${i},this.value)">
- ${['طلب جديد','تم التأكيد','قيد التجهيز','خرج للتوصيل','تم التسليم','ملغي'].map(s=>`<option ${o.status===s?'selected':''}>${s}</option>`).join('')}
- </select></td></tr>`).join(''):'<tr><td colspan="7">لا توجد طلبات محفوظة على هذا الجهاز حتى الآن.</td></tr>';
-}
-function changeOrderStatus(i,status){const orders=JSON.parse(localStorage.getItem('aldurra_orders')||'[]');if(orders[i]){orders[i].status=status;localStorage.setItem('aldurra_orders',JSON.stringify(orders));renderOrders();}}
-render();renderOrders();
-</script><script>
-if ("serviceWorker" in navigator) {
-  window.addEventListener("load", () => navigator.serviceWorker.register("./service-worker.js").catch(()=>{}));
-}
+const cfg=window.SUPABASE_CONFIG, owner="mahmoud676king@gmail.com";
+let token=null,refreshToken=null,products=[];
+const $=id=>document.getElementById(id),say=t=>$("status").textContent=t;
+const money=n=>Number(n||0).toLocaleString("en-US")+" ج.س";
+function headers(extra={}){return {apikey:cfg.publishableKey,Authorization:"Bearer "+(token||cfg.publishableKey),"Content-Type":"application/json",...extra}}
+async function api(table,opts={}){const r=await fetch(cfg.url+"/rest/v1/"+table,{...opts,headers:headers(opts.headers||{})});if(!r.ok)throw new Error(await r.text());return r.status===204?[]:r.json()}
+function showApp(){ $("loginCard").classList.add("hidden");$("app").classList.remove("hidden"); }
+async function sendLogin(){const email=$("email").value.trim().toLowerCase();if(email!==owner){$("loginMsg").textContent="هذا البريد غير مصرح له بالإدارة.";return;}
+$("loginMsg").textContent="جارٍ إرسال رابط الدخول...";try{const r=await fetch(cfg.url+"/auth/v1/otp",{method:"POST",headers:{apikey:cfg.publishableKey,"Content-Type":"application/json"},body:JSON.stringify({email,create_user:false,gotrue_meta_security:{}})});if(!r.ok)throw new Error(await r.text());$("loginMsg").textContent="تم الإرسال. افتح بريدك واضغط رابط الدخول من نفس الجهاز."; }catch(e){$("loginMsg").textContent="تعذر الإرسال: "+e.message;}}
+async function acceptMagicLink(){const hash=new URLSearchParams(location.hash.slice(1));const at=hash.get("access_token"),rt=hash.get("refresh_token");if(at&&rt){token=at;refreshToken=rt;history.replaceState(null,"",location.pathname);try{const r=await fetch(cfg.url+"/auth/v1/user",{headers:headers()});const u=await r.json();if(!r.ok||String(u.email||"").toLowerCase()!==owner)throw new Error("البريد غير مصرح له.");localStorage.setItem("aldurra_admin_session",JSON.stringify({token,refreshToken}));showApp();await loadAll();}catch(e){logout();alert("فشل التحقق من حساب الإدارة: "+e.message);}return true;}return false;}
+async function restore(){const saved=localStorage.getItem("aldurra_admin_session");if(!saved)return;try{const s=JSON.parse(saved);token=s.token;refreshToken=s.refreshToken;const r=await fetch(cfg.url+"/auth/v1/user",{headers:headers()});const u=await r.json();if(!r.ok||String(u.email||"").toLowerCase()!==owner)throw 0;showApp();await loadAll();}catch(e){logout();}}
+function logout(){token=null;refreshToken=null;localStorage.removeItem("aldurra_admin_session");$("app").classList.add("hidden");$("loginCard").classList.remove("hidden");}
+function esc(s){return String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
+async function loadAll(){say("جارٍ تحميل البيانات...");try{products=await api("products?select=*&order=sort_order.asc,id.asc");renderProducts();const orders=await api("orders?select=*&order=created_at.desc");$("orders").innerHTML=orders.map(o=>`<tr><td>${esc(o.tracking_code)}</td><td>${new Date(o.created_at).toLocaleString("ar")}</td><td>${esc(o.customer_name)}</td><td>${esc(o.customer_phone)}</td><td>${money(o.total_sdg)}</td><td><select onchange="updateOrder('${o.id}',this.value)">${[["new","طلب جديد"],["confirmed","تم التأكيد"],["preparing","قيد التجهيز"],["ready","جاهز للاستلام"],["out_for_delivery","خرج للتوصيل"],["completed","تم التسليم"],["cancelled","ملغي"]].map(([v,l])=>`<option value="${v}" ${o.status===v?"selected":""}>${l}</option>`).join("")}</select></td></tr>`).join("")||'<tr><td colspan="6">لا توجد طلبات حتى الآن</td></tr>';
+const msgs=await api("customer_messages?select=*&order=created_at.desc");$("messages").innerHTML=msgs.map(m=>`<tr><td>${esc(m.customer_name)}</td><td>${esc(m.customer_phone)}</td><td>${esc(m.message)}</td><td>${new Date(m.created_at).toLocaleString("ar")}</td></tr>`).join("")||'<tr><td colspan="4">لا توجد رسائل</td></tr>';
+const reqs=await api("product_requests?select=*&order=created_at.desc");$("requests").innerHTML=reqs.map(x=>`<tr><td>${esc(x.requested_product)}</td><td>${esc(x.details)}</td><td>${esc(x.customer_phone)}</td><td>${new Date(x.created_at).toLocaleString("ar")}</td><td>${esc(x.status)}</td></tr>`).join("")||'<tr><td colspan="5">لا توجد طلبات منتجات</td></tr>';say("تم تحديث البيانات");}catch(e){say("خطأ: "+e.message);}}
+function renderProducts(){const q=($("search").value||"").toLowerCase();$("products").innerHTML=products.filter(p=>p.name.toLowerCase().includes(q)).map(p=>`<tr><td>${p.id}</td><td><input id="n${p.id}" value="${esc(p.name)}"></td><td><input id="p${p.id}" type="number" min="0" value="${p.price_sdg}"></td><td><input id="s${p.id}" type="number" min="0" value="${p.stock_quantity??0}"></td><td><input id="a${p.id}" type="checkbox" ${p.is_active?"checked":""}></td><td><button class="gold" onclick="saveProduct(${p.id})">حفظ</button></td></tr>`).join("");}
+async function saveProduct(id){try{const p={name:$("n"+id).value.trim(),price_sdg:Number($("p"+id).value),stock_quantity:Number($("s"+id).value),is_active:$("a"+id).checked};if(!p.name||p.price_sdg<0||p.stock_quantity<0)throw new Error("راجع الاسم والسعر والكمية");await api("products?id=eq."+id,{method:"PATCH",headers:{"Prefer":"return=minimal"},body:JSON.stringify(p)});say("تم حفظ المنتج");await loadAll();}catch(e){alert("لم يتم الحفظ: "+e.message);}}
+async function addProduct(){try{const name=$("newName").value.trim(),price=Number($("newPrice").value),stock=Number($("newStock").value||0);if(!name||price<0||stock<0)throw new Error("أدخل الاسم والسعر والكمية");let image_url=null;const f=$("newImage").files[0];if(f){if(f.size>5*1024*1024)throw new Error("الصورة أكبر من 5 ميجابايت");const path="products/"+Date.now()+"-"+f.name.replace(/[^a-zA-Z0-9._-]/g,"_");const up=await fetch(cfg.url+"/storage/v1/object/aldurra-products/"+path,{method:"POST",headers:{apikey:cfg.publishableKey,Authorization:"Bearer "+token,"Content-Type":f.type},body:f});if(!up.ok)throw new Error(await up.text());image_url=cfg.url+"/storage/v1/object/public/aldurra-products/"+path;}await api("products",{method:"POST",headers:{"Prefer":"return=minimal"},body:JSON.stringify({name,price_sdg:price,stock_quantity:stock,image_url,is_active:true,sort_order:products.length+1})});$("newName").value=$("newPrice").value=$("newStock").value="";$("newImage").value="";await loadAll();}catch(e){alert("تعذرت إضافة المنتج: "+e.message);}}
+async function updateOrder(id,status){try{await api("orders?id=eq."+id,{method:"PATCH",headers:{"Prefer":"return=minimal"},body:JSON.stringify({status})});say("تم تحديث حالة الطلب");}catch(e){alert("تعذر تحديث الطلب: "+e.message);}}
+(async()=>{if(!await acceptMagicLink())await restore();})();
 </script></body></html>
