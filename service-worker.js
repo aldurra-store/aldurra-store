@@ -1,7 +1,7 @@
 const CACHE_NAME = "aldurra-store-v1";
 const CORE_FILES = [
   "./", "./index.html", "./admin.html", "./manifest.webmanifest",
-  "./assets/logo.jpg"
+  "././logo.jpg"
 ];
 self.addEventListener("install", event => {
   event.waitUntil(caches.open(CACHE_NAME).then(cache => cache.addAll(CORE_FILES)));
