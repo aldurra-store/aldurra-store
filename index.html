@@ -128,10 +128,12 @@ async function submitOrder(){
  const customerPhone=document.getElementById("phone").value.trim();
  if(!customerName||!customerPhone){alert("من فضلك أدخل الاسم ورقم الهاتف لإتمام الطلب.");return;}
  const fulfillment=document.getElementById("delivery").value;
+ const orderAddress=document.getElementById("orderNote").value.trim();
+ if(fulfillment==="delivery"&&!orderAddress){alert("من فضلك أدخل عنوان التوصيل داخل أم درمان.");return;}
  const fee=fulfillment==="delivery"?7000:0;
  const subtotal=entries.reduce((s,[i,q])=>s+money(products[i].price)*q,0);
  const payment=document.getElementById("method").value.includes("تحويل")?"bank_transfer":"cash_on_delivery";
- const orderPayload={customer_name:customerName,customer_phone:customerPhone,fulfillment_type:fulfillment,delivery_area:fulfillment==="delivery"?"Omdurman":null,delivery_address:fulfillment==="delivery"?document.getElementById("orderNote").value.trim():null,delivery_fee_sdg:fee,payment_method:payment,items:entries.map(([i,q])=>({name:products[i].name,quantity:q,unit_price_sdg:money(products[i].price)})),subtotal_sdg:subtotal,total_sdg:subtotal+fee,customer_notes:document.getElementById("orderNote").value.trim()||null};
+ const orderPayload={customer_name:customerName,customer_phone:customerPhone,fulfillment_type:fulfillment,delivery_area:fulfillment==="delivery"?"Omdurman":null,delivery_address:fulfillment==="delivery"?orderAddress:null,delivery_fee_sdg:fee,payment_method:payment,items:entries.map(([i,q])=>({name:products[i].name,quantity:q,unit_price_sdg:money(products[i].price)})),subtotal_sdg:subtotal,total_sdg:subtotal+fee,customer_notes:orderAddress||null};
  const btn=document.querySelector('button[onclick="submitOrder()"]');
  if(btn){btn.disabled=true;btn.textContent="جارٍ إرسال الطلب...";}
  try{
