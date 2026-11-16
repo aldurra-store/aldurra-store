@@ -1,4 +1,4 @@
-const CACHE_NAME = "aldurra-store-v7";
+const CACHE_NAME = "aldurra-store-v8";
 const CORE_FILES = [
   "./", "./index.html", "./admin.html", "./manifest.webmanifest",
   "./logo.jpg"
@@ -15,6 +15,12 @@ self.addEventListener("activate", event => {
 });
 self.addEventListener("fetch", event => {
   if (event.request.method !== "GET") return;
+  const requestUrl = new URL(event.request.url);
+  // Never serve the admin page from an old service-worker cache.
+  if (requestUrl.pathname.endsWith("/admin.html")) {
+    event.respondWith(fetch(event.request, { cache: "no-store" }));
+    return;
+  }
   event.respondWith(caches.match(event.request).then(cached =>
     cached || fetch(event.request).then(response => {
       const copy = response.clone();
