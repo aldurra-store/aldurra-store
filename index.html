@@ -45,10 +45,10 @@ footer{background:#24112b;color:#f7edf7;padding:26px 5vw;margin-top:35px}
 footer h3{color:#e5c16e;margin-top:0}footer a{color:#f2d58e}
 @media(max-width:850px){.products{grid-template-columns:repeat(3,1fr)}.hero{grid-template-columns:1fr}.foot{grid-template-columns:1fr 1fr}}
 @media(max-width:560px){.products{grid-template-columns:repeat(2,1fr);gap:9px}.product img,.placeholder{height:145px}.product-info{padding:9px}.product h3{font-size:13px;min-height:44px}.price{font-size:16px}.nav{align-items:flex-start;flex-wrap:wrap}.grid2,.foot{grid-template-columns:1fr}.hero{margin-top:20px}}
-</style><link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="assets/logo.jpg"></head>
+</style><link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="./logo.jpg"></head>
 <body>
 <header><nav class="nav">
-<div class="brand"><img src="assets/logo.jpg" alt="شعار الدرة"><span>الدُرّة<small>للأواني المنزلية</small></span></div>
+<div class="brand"><img src="./logo.jpg" alt="شعار الدرة"><span>الدُرّة<small>للأواني المنزلية</small></span></div>
 <div><a href="#products">المنتجات</a><a href="#contact">تواصل معنا</a></div>
 </nav><section class="hero"><div>
 <h1>كل ما يجمّل بيتك… في مكان واحد</h1><p>تصفّح منتجات الدُرّة، أضف احتياجاتك إلى السلة وأرسل طلبك مباشرة عبر واتساب.</p>
@@ -102,7 +102,7 @@ async function loadProductsFromDatabase(){
 function renderProducts(){
  document.getElementById("productGrid").innerHTML = products.map((p,i)=>`
  <article class="product">
-  ${p.img ? `<img src="assets/${p.img}" alt="${p.name}" loading="lazy">` : `<div class="placeholder">صورة المنتج<br>قريباً</div>`}
+  ${p.img ? `<img src="./${p.img}" alt="${p.name}" loading="lazy">` : `<div class="placeholder">صورة المنتج<br>قريباً</div>`}
   <div class="product-info"><h3>${p.name}</h3><div class="price">${p.price} ج.س</div>
   <button class="goldbtn" onclick="addToCart(${i})">أضف إلى السلة</button></div></article>`).join("");
 }
