@@ -95,7 +95,7 @@ async function sbRequest(path, options={}) {
 }
 async function loadProductsFromDatabase(){
  try { const rows=await sbRequest("products?select=id,name,price_sdg,image_url,description,is_active,sort_order&is_active=eq.true&order=sort_order.asc,id.asc");
-   if(Array.isArray(rows)&&rows.length){ products=rows.map((r,i)=>({...defaultProducts.find(x=>x.name===r.name), id:r.id, name:r.name, price:Number(r.price_sdg).toLocaleString("en-US").replaceAll(",","."), img:(defaultProducts.find(x=>x.name===r.name)||{}).img||null, description:r.description||""})); renderProducts();renderCart(); }
+   if(Array.isArray(rows)&&rows.length){ products=rows.map((r,i)=>({...defaultProducts.find(x=>x.name===r.name), id:r.id, name:r.name, price:Number(r.price_sdg).toLocaleString("en-US").replaceAll(",","."), img:r.image_url||(defaultProducts.find(x=>x.name===r.name)||{}).img||null, description:r.description||""})); renderProducts();renderCart(); }
  } catch(e){ console.warn("تعذر تحميل المنتجات من قاعدة البيانات؛ تم استخدام النسخة المحلية.",e); }
 }
 
