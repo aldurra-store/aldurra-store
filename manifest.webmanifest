@@ -11,7 +11,7 @@
   "theme_color": "#301039",
   "icons": [
     {
-      "src": "assets/logo.jpg",
+      "src": "./logo.jpg",
       "sizes": "any",
       "type": "image/jpeg",
       "purpose": "any"
