@@ -65,7 +65,8 @@ footer h3{color:#e5c16e;margin-top:0}footer a{color:#f2d58e}
 <div><label for="method">طريقة الدفع</label><select id="method"><option>الدفع عند الاستلام</option><option>تحويل إلكتروني / بنكي</option></select></div>
 <div><label for="delivery">طريقة الاستلام</label><select id="delivery" onchange="renderCart()"><option value="delivery">توصيل داخل أم درمان (+7.000)</option><option value="pickup">استلام مجاني من المحل</option></select></div></div>
 <label for="orderNote">العنوان أو ملاحظات الطلب</label><textarea id="orderNote" placeholder="عنوانك داخل أم درمان أو أي تفاصيل إضافية"></textarea>
-<button class="submit" onclick="sendOrder()">إرسال الطلب عبر واتساب</button>
+<button class="submit" onclick="submitOrder()">تأكيد وإرسال الطلب</button>
+<button class="submit" style="background:#16834a;margin-inline-start:8px" onclick="sendWhatsAppOrder()">إرسال تفاصيل الطلب عبر واتساب (اختياري)</button>
 <div class="note">التوصيل متاح داخل أم درمان فقط برسوم 7.000. خارج أم درمان غير متاح حالياً. الاستلام من المحل مجاني. يتم تأكيد الطلب والتوفر عبر واتساب.</div></section>
 <section class="panel" id="feedback"><h2>الشكاوى والمقترحات</h2><p class="sub">رأيك مهم بالنسبة لنا.</p>
 <label for="feedbackName">الاسم</label><input id="feedbackName" placeholder="اسمك"><label for="feedbackText">اكتب شكواك أو مقترحك</label><textarea id="feedbackText" placeholder="اكتب رسالتك هنا"></textarea><button class="submit" onclick="sendFeedback()">إرسال عبر واتساب</button></section>
@@ -118,31 +119,49 @@ function renderCart(){
  document.getElementById("deliveryFee").textContent=fmt(fee)+" ج.س";
  document.getElementById("total").textContent=fmt(subtotal+fee)+" ج.س";
 }
-async function sendOrder(){
- const entries=Object.entries(cart); if(!entries.length){alert("أضف منتجاً واحداً على الأقل إلى السلة.");return;}
- const lines=entries.map(([i,q])=>`- ${products[i].name} × ${q} = ${fmt(money(products[i].price)*q)} ج.س`);
+async function submitOrder(){
+ const entries=Object.entries(cart);
+ if(!entries.length){alert("أضف منتجاً واحداً على الأقل إلى السلة.");return;}
+ const customerName=document.getElementById("customer").value.trim();
+ const customerPhone=document.getElementById("phone").value.trim();
+ if(!customerName||!customerPhone){alert("من فضلك أدخل الاسم ورقم الهاتف لإتمام الطلب.");return;}
+ const fulfillment=document.getElementById("delivery").value;
+ const fee=fulfillment==="delivery"?7000:0;
+ const subtotal=entries.reduce((s,[i,q])=>s+money(products[i].price)*q,0);
+ const payment=document.getElementById("method").value.includes("تحويل")?"bank_transfer":"cash_on_delivery";
+ const orderPayload={customer_name:customerName,customer_phone:customerPhone,fulfillment_type:fulfillment,delivery_area:fulfillment==="delivery"?"Omdurman":null,delivery_address:fulfillment==="delivery"?document.getElementById("orderNote").value.trim():null,delivery_fee_sdg:fee,payment_method:payment,items:entries.map(([i,q])=>({name:products[i].name,quantity:q,unit_price_sdg:money(products[i].price)})),subtotal_sdg:subtotal,total_sdg:subtotal+fee,customer_notes:document.getElementById("orderNote").value.trim()||null};
+ const btn=document.querySelector('button[onclick="submitOrder()"]');
+ if(btn){btn.disabled=true;btn.textContent="جارٍ إرسال الطلب...";}
+ try{
+   const saved=await sbRequest("orders",{method:"POST",headers:{Prefer:"return=representation"},body:JSON.stringify(orderPayload)});
+   try{
+     const orders=JSON.parse(localStorage.getItem("aldurra_orders")||"[]");
+     orders.unshift({id:saved?.[0]?.tracking_code||"DR-"+Date.now(),date:new Date().toLocaleString("ar"),name:customerName,phone:customerPhone,items:entries.map(([i,q])=>({name:products[i].name,qty:q,price:products[i].price})),subtotal,delivery:fee,total:subtotal+fee,payment:document.getElementById("method").value,fulfillment:fulfillment==="delivery"?"توصيل داخل أم درمان":"استلام مجاني من المحل",notes:document.getElementById("orderNote").value,status:"طلب جديد"});
+     localStorage.setItem("aldurra_orders",JSON.stringify(orders));
+   }catch(e){console.warn("تعذر حفظ نسخة محلية من الطلب",e);}
+   Object.keys(cart).forEach(k=>delete cart[k]);
+   renderCart();
+   document.getElementById("customer").value="";
+   document.getElementById("phone").value="";
+   document.getElementById("orderNote").value="";
+   alert("تم استلام طلبك بنجاح! رقم الطلب: "+(saved?.[0]?.tracking_code||"سيظهر في لوحة الإدارة")+". سنتواصل معك لتأكيد الطلب.");
+ }catch(e){
+   alert("لم نتمكن من حفظ الطلب: "+e.message+". لم يتم تسجيله، حاول مرة أخرى أو تواصل معنا.");
+ }finally{
+   if(btn){btn.disabled=false;btn.textContent="تأكيد وإرسال الطلب";}
+ }
+}
+function sendWhatsAppOrder(){
+ const entries=Object.entries(cart);
+ if(!entries.length){alert("أضف منتجات إلى السلة أولاً.");return;}
+ const customerName=document.getElementById("customer").value.trim();
+ const customerPhone=document.getElementById("phone").value.trim();
+ if(!customerName||!customerPhone){alert("من فضلك أدخل الاسم ورقم الهاتف أولاً.");return;}
+ const lines=entries.map(([i,q])=>"- "+products[i].name+" × "+q+" = "+fmt(money(products[i].price)*q)+" ج.س");
  const subtotal=entries.reduce((s,[i,q])=>s+money(products[i].price)*q,0);
  const fee=document.getElementById("delivery").value==="delivery"?7000:0;
- const deliveryText=fee?"توصيل داخل أم درمان":"استلام مجاني من المحل";
- const msg=`طلب جديد من متجر الدرة\nالاسم: ${document.getElementById("customer").value}\nالهاتف: ${document.getElementById("phone").value}\n${lines.join("\n")}\nقيمة المنتجات: ${fmt(subtotal)}\nرسوم التوصيل: ${fmt(fee)}\nالإجمالي: ${fmt(subtotal+fee)}\nالدفع: ${document.getElementById("method").value}\nالاستلام: ${deliveryText}\nالعنوان/ملاحظات: ${document.getElementById("orderNote").value}`;
- try {
-   const customerName=document.getElementById("customer").value.trim();
-   const customerPhone=document.getElementById("phone").value.trim();
-   if(!customerName||!customerPhone){alert("من فضلك أدخل الاسم ورقم الهاتف لإتمام الطلب.");return;}
-   const fulfillment=document.getElementById("delivery").value;
-   const payment=document.getElementById("method").value.includes("تحويل")?"bank_transfer":"cash_on_delivery";
-   const orderPayload={customer_name:customerName,customer_phone:customerPhone,fulfillment_type:fulfillment,delivery_area:fulfillment==="delivery"?"أم درمان":null,delivery_address:fulfillment==="delivery"?document.getElementById("orderNote").value:null,delivery_fee_sdg:fee,payment_method:payment,items:entries.map(([i,q])=>({name:products[i].name,quantity:q,unit_price_sdg:money(products[i].price)})),subtotal_sdg:subtotal,total_sdg:subtotal+fee,customer_notes:document.getElementById("orderNote").value||null};
-   await sbRequest("orders",{method:"POST",headers:{Prefer:"return=minimal"},body:JSON.stringify(orderPayload)});
- } catch(e) { alert("لم نتمكن من حفظ الطلب في قاعدة البيانات: "+e.message+". لن نرسل الطلب حتى لا يضيع."); return; }
- try {
-   const orders = JSON.parse(localStorage.getItem("aldurra_orders") || "[]");
-   orders.unshift({id:"DR-"+Date.now(),date:new Date().toLocaleString("ar"),name:document.getElementById("customer").value,
-     phone:document.getElementById("phone").value,items:entries.map(([i,q])=>({name:products[i].name,qty:q,price:products[i].price})),
-     subtotal,delivery:fee,total:subtotal+fee,payment:document.getElementById("method").value,
-     fulfillment:deliveryText,notes:document.getElementById("orderNote").value,status:"طلب جديد"});
-   localStorage.setItem("aldurra_orders",JSON.stringify(orders));
- } catch(e) { alert("تعذر حفظ سجل الطلب على هذا الجهاز، لكن يمكنك متابعة الإرسال عبر واتساب."); }
- window.open(`https://wa.me/${wa}?text=${encodeURIComponent(msg)}`,"_blank");
+ const msg="طلب من متجر الدرة\\nالاسم: "+customerName+"\\nالهاتف: "+customerPhone+"\\n"+lines.join("\\n")+"\\nقيمة المنتجات: "+fmt(subtotal)+"\\nرسوم التوصيل: "+fmt(fee)+"\\nالإجمالي: "+fmt(subtotal+fee)+"\\nالدفع: "+document.getElementById("method").value+"\\nالعنوان/ملاحظات: "+document.getElementById("orderNote").value;
+ window.open("https://wa.me/"+wa+"?text="+encodeURIComponent(msg),"_blank");
 }
 function sendFeedback(){const n=document.getElementById("feedbackName").value,t=document.getElementById("feedbackText").value;if(!t.trim()){alert("اكتب الشكوى أو المقترح أولاً.");return;}window.open(`https://wa.me/${wa}?text=${encodeURIComponent("شكوى أو مقترح – متجر الدرة\nالاسم: "+n+"\nالرسالة: "+t)}`,"_blank");}
 function sendRequest(){const w=document.getElementById("wanted").value,d=document.getElementById("wantedDetails").value;if(!w.trim()){alert("اكتب اسم المنتج المطلوب أولاً.");return;}window.open(`https://wa.me/${wa}?text=${encodeURIComponent("طلب منتج غير متوفر – متجر الدرة\nالمنتج: "+w+"\nتفاصيل: "+d)}`,"_blank");}
