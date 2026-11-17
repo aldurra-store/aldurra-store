@@ -1,6 +1,6 @@
-const CACHE_NAME = "aldurra-store-v13";
+const CACHE_NAME = "aldurra-store-v14";
 const CORE_FILES = [
-  "./", "./index.html", "./admin.html", "./manifest.webmanifest",
+  "./", "./index.html", "./admin.html", "./manifest.webmanifest", "./supabase-config.js",
   "./logo.jpg"
 ];
 self.addEventListener("install", event => {
@@ -16,6 +16,11 @@ self.addEventListener("activate", event => {
 self.addEventListener("fetch", event => {
   if (event.request.method !== "GET") return;
   const requestUrl = new URL(event.request.url);
+  // Always fetch the public database config fresh; never serve a stale or missing config.
+  if (requestUrl.pathname.endsWith("/supabase-config.js")) {
+    event.respondWith(fetch(event.request, { cache: "no-store" }));
+    return;
+  }
   // Never serve the admin page from an old service-worker cache.
   if (requestUrl.pathname.endsWith("/admin.html")) {
     event.respondWith(fetch(event.request, { cache: "no-store" }));
