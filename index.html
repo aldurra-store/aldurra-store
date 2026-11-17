@@ -92,7 +92,7 @@ const fmt = n => Math.round(n).toLocaleString("en-US").replaceAll(","," .").repl
 const sb = window.SUPABASE_CONFIG || {};
 async function sbRequest(path, options={}) {
  if(!sb.url || !sb.publishableKey) throw new Error("إعداد قاعدة البيانات غير مكتمل");
- const response = await fetch(sb.url + "/rest/v1/" + path, { ...options, headers: { apikey: sb.publishableKey, "Content-Type":"application/json", ...(options.headers||{}) } });
+ const response = await fetch(sb.url + "/rest/v1/" + path, { ...options, headers: { apikey: sb.publishableKey, Authorization: "Bearer " + sb.publishableKey, "Content-Type":"application/json", ...(options.headers||{}) } });
  if(!response.ok){let detail="";try{const body=await response.json();detail=body.message||body.error_description||body.error||body.details||"";}catch(_){} throw new Error("تعذر الاتصال بقاعدة البيانات ("+response.status+") "+detail); }
  return response.status===204 ? null : response.json();
 }
